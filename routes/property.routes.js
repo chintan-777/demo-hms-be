@@ -4,17 +4,35 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 const router = express.Router();
 
-const Property = require("../model/property.model");
+const fs = require("fs");
+const path = require("path");
+var multer = require("multer");
+var upload = multer({ dest: "./upload" });
 
-router.post("/", (req, res) => {
+const Property = require("../model/property.model");
+const { validate } = require("../model/room.model");
+
+router.post("/", upload.array("file"), (req, res) => {
   res.header("Content-Type", "application/json");
-  console.log("req", req.body);
   const property = new Property({
     ...req.body,
+    images: req.files && req.files.length !== 0 ? req.files : [],
     createdOn: new Date(),
   });
-  property.save();
-  res.send(property);
+  property
+    .save()
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(400);
+      const errMessage = err.keyValue?.email
+        ? "Email Already added"
+        : err.keyValue?.phone
+        ? "Phone already added"
+        : "";
+      res.send({ message: errMessage });
+    });
 });
 
 router.get("/", async (req, res) => {
@@ -48,6 +66,35 @@ router.patch("/:id", async (req, res) => {
       res.status(404);
       res.send({ message: "Property Not Found" });
     } else {
+      res.send({ ...property._doc, ...req.body });
+    }
+  });
+  // console.log("first", query);
+});
+
+router.put("/:id", upload.array("file"), async (req, res) => {
+  res.header("Content-Type", "application/json");
+  const query = await Property.findOneAndUpdate(
+    { _id: req.params.id },
+    {
+      ...req.body,
+      images: req.files && req.files.length !== 0 ? req.files : [],
+    }
+  ).exec(async (err, property) => {
+    if (!property) {
+      res.status(404);
+      res.send({ message: "Property Not Found" });
+    } else {
+      await Promise.all(
+        property.images.map(async (img) => {
+          return await fs.unlink(
+            path.join(__dirname + "/../" + img.path),
+            (err) => {
+              console.log("first", err);
+            }
+          );
+        })
+      );
       res.send({ ...property._doc, ...req.body });
     }
   });
