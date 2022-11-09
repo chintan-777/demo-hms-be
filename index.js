@@ -2,7 +2,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
-const port = 3000;
+const port = 4000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -10,8 +10,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // routes
 const property = require("./routes/property.routes");
 const room = require("./routes/room.routes");
+const auth = require("./routes/auth.routes");
+const user = require("./routes/user.routes");
+
 app.use("/property", property);
 app.use("/room", room);
+app.use("/auth", auth);
+app.use("/user", user);
 
 const path = require("path");
 app.use("/upload", express.static(path.join(__dirname, "upload")));

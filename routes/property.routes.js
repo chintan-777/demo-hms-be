@@ -26,9 +26,9 @@ router.post("/", upload.array("file"), (req, res) => {
     })
     .catch((err) => {
       res.status(400);
-      const errMessage = err.keyValue?.email
+      const errMessage = err.keyPattern?.email
         ? "Email Already added"
-        : err.keyValue?.phone
+        : err.keyPattern?.phone
         ? "Phone already added"
         : "";
       res.send({ message: errMessage });
