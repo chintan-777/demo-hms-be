@@ -22,6 +22,7 @@ exports.register = async (req, res, next) => {
   }
 
   let token = req.cookies?.auth_token;
+  // if user is logged in
   if (token) {
     let verifiedUser = jwt.verify(token, SECRET_KEY);
     if (["admin", "super-admin"].includes(req.body.role)) {
@@ -30,7 +31,6 @@ exports.register = async (req, res, next) => {
         return;
       }
     }
-  } else {
     if (req.body.role !== "user") {
       res.status(401).send({ message: "You are not authorised" });
       return;
@@ -81,7 +81,7 @@ exports.users = async (req, res, next) => {
     res.status(401).send({ message: "You are not authorised" });
     return;
   }
-  const query = await User.find({})
+  const query = await User.find({ $or: [...queries] })
     .then((users) => {
       res.send(
         users.map((user) => {
@@ -96,8 +96,6 @@ exports.users = async (req, res, next) => {
       res.status(400).send({ message: err.message });
     });
 };
-
-exports.getUser = async (req, res, next) => {};
 
 exports.deleteUser = async (req, res, next) => {
   await User.findByIdAndDelete(req.params.id)

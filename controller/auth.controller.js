@@ -8,8 +8,16 @@ const SECRET_KEY = "TEST_IT_OUT";
 
 exports.signIn = async (req, res, next) => {
   let token = req.cookies?.auth_token;
-  if (token) {
-    let verifiedUser = jwt.verify(token, SECRET_KEY);
+  if (token && !req.body.email) {
+    let verifiedUser;
+    try {
+      verifiedUser = jwt.verify(token, SECRET_KEY);
+    } catch (err) {
+      return res
+        .status(400)
+        .send({ message: "Your session has expired, please sign-in" });
+    }
+    console.log("object", verifiedUser);
     res.status(200).send(verifiedUser.user);
     return;
   }
@@ -47,11 +55,10 @@ exports.signIn = async (req, res, next) => {
     .catch((err) => {
       res.status(400).send({ message: err.message });
     });
-  // let hashPassword;
-  // const salt = await bcrypt.genSalt(10);
-  // if (req.body.password) {
-  //   hashPassword = await bcrypt.hash(req.body.password, salt);
-  // } else {
-  //   hashPassword = await bcrypt.hash("Abc@@123#", salt);
-  // }
+};
+
+exports.logout = async (req, res, next) => {
+  let token = req.cookies?.auth_token;
+  res.clearCookie("auth_token");
+  res.status(201).send({ message: "You are logged out" });
 };
