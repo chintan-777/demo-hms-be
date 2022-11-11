@@ -7,6 +7,7 @@ const router = express.Router();
 const userController = require("../controller/user.controller");
 
 router.get("/", userController.users);
+// router.get("/:id", userController.user);
 router.delete("/:id", userController.deleteUser);
 
 module.exports = router;

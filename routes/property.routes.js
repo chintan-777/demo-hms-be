@@ -26,11 +26,7 @@ router.post("/", upload.array("file"), (req, res) => {
     })
     .catch((err) => {
       res.status(400);
-      const errMessage = err.keyPattern?.email
-        ? "Email Already added"
-        : err.keyPattern?.phone
-        ? "Phone already added"
-        : "";
+      const errMessage = err.message;
       res.send({ message: errMessage });
     });
 });

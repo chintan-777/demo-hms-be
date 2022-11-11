@@ -1,11 +1,13 @@
 const bodyParser = require("body-parser");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const app = express();
 const port = 4000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // routes
 const property = require("./routes/property.routes");

@@ -14,7 +14,9 @@ router.post("/", async (req, res) => {
         res.status(404);
         res.header("Content-Type", "application/json");
         res.send({ message: "Property Not Found" });
+        // return;
       }
+      console.log("first", err);
       const roomData = new Room({ ...req.body, createdOn: new Date() });
       await roomData.save();
       res.header("Content-Type", "application/json");
